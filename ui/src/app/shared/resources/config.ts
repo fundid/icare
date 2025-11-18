@@ -250,4 +250,14 @@ export const ICARE_CONFIG = {
     '[{"name":"Followup","id":"Followup","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Exemption","id":"Exemption","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Revenue","id":"Revenue","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Register","id":"Register","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"OPD","id":"OPD","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"IPD","id":"IPD","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Pharmacy","id":"Pharmacy","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Radiology","id":"Radiology","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"MTUHA","id":"MTUHA","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Laboratory","id":"Laboratory","department":"0198cde9-4c50-4250-abec-b09ae58bb563"},{"name":"Settings","id":"Settings","department":"0198cde9-4c50-4250-abec-b09ae58bb563"}]',
   "icare.Reports.Parameters.Configurations":
     '[{"name":"Patients Attended","id":"88f3d96a-9e51-4562-938b-b0b000a48e34","parameters":[{"order":"1","id":"startDate","type":"DATETIME","label":"Start Date & Time","name":"StartDate"},{"order":"2","id":"endDate","type":"DATETIME","label":"End Date & Time","name":"endDate"}]},{"name":"Top Ten Drugs","id":"d9325cb1-b762-4e51-803b-0c4d660e06b3","parameters":[{"order":"1","id":"startDate","type":"DATETIME","label":"Start Date & Time","name":"StartDate"},{"order":"2","id":"endDate","type":"DATETIME","label":"End Date & Time","name":"endDate"}]},{"name":"Drug Prices","id":"239ce31d-be04-4ff2-977e-19bf884ac98e","parameters":[{"order":"1","id":"pcategory","type":"dropdown","label":"Payment Category","name":"Payment Category","options":[{"label":"NHIF","name":"NHIF"},{"label":"CASH","name":"Cash"},{"label":"JUBILEE","name":"JUBILEE"},{"label":"STRATEGIES","name":"STRATEGIES"}]},{"order":"2","type":"dropdown","id":"pscheme","label":"Payment Scheme","name":"Payment Scheme","options":[{"label":"STANDARD/NAJALI AFYA/TIMIZA/NAWEZA","name":"STANDARD/NAJALI AFYA/TIMIZA/NAWEZA","dependencyParameterOptions":["NHIF"]},{"label":"BUNGE","name":"BUNGE","dependencyParameterOptions":["NHIF"]},{"label":"BOT","name":"BOT","dependencyParameterOptions":["NHIF"]},{"label":"New","name":"New","dependencyParameterOptions":["Cash","JUBILEE","STRATEGIES"]},{"label":"Follow up","name":"Follow up","dependencyParameterOptions":["Cash","JUBILEE","STRATEGIES"]}]}]}]',
+  location: {
+    attributes: {
+      service: "d6794daf-f62f-454e-89eb-6ea98188352f",
+      module: "iCARE101-UDSM-451f-8efe-a0db56f09676",
+      billingConcept: "iCAR7002-UDSM-attr-8efe-a0db56f09676",
+    },
+  },
+  observationChart: {
+    formUuid: "2a7d282f-a97a-4618-9515-9c0028d575d8",
+  },
 };

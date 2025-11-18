@@ -116,16 +116,20 @@ export const getIsPatientSentForExemption = (orderTypeUuid: string) => createSel
   (activeVisit) => {
     if (activeVisit) {
       let encountersWithExemptionOrderActive = activeVisit.encounters.filter((encounter) => {
-        //TODO: to be worked on making sure fulfiller status is one of the order properties in an encounter orders list
-        let orders =  encounter.orders.filter((order) => {
-          if(order.orderType.uuid === orderTypeUuid){
-            return order
+        let orders = encounter.orders.filter((order) => {
+          // Check if order matches the type and is not completed
+          if (order.orderType.uuid === orderTypeUuid) {
+            // If fulfillerStatus exists, check it's not completed
+            // If fulfillerStatus doesn't exist or is not "COMPLETED", consider it active
+            const isActive = !order.fulfillerStatus || order.fulfillerStatus !== "COMPLETED";
+            return isActive;
           }
-        })
-        if(orders.length > 0){
+          return false;
+        });
+        if (orders.length > 0) {
           return encounter;
         }
-      })
+      });
       return encountersWithExemptionOrderActive.length > 0 ? true : false;
     } else {
       return false;

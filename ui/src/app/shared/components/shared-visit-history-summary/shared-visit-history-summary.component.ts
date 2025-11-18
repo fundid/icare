@@ -8,6 +8,7 @@ import { getGroupedObservationByDateAndTimeOfIPDRounds } from "src/app/store/sel
 import { FormService } from "../../modules/form/services/form.service";
 import { Visit } from "../../resources/visits/models/visit.model";
 import { VisitsService } from "../../resources/visits/services";
+import { ICARE_CONFIG } from "../../resources/config";
 
 @Component({
   selector: "app-shared-visit-history-summary",
@@ -28,14 +29,12 @@ export class SharedVisitHistorySummaryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // TODO: Visit Notes form to be softcoded
     this.customForms$ = this.store.select(
       getCustomOpenMRSFormsByIds(this.location?.forms || [])
     );
 
-    // TODO: Find a way to softcode this
     this.observationChartForm$ = this.formService.getCustomeOpenMRSForm(
-      "2a7d282f-a97a-4618-9515-9c0028d575d8"
+      ICARE_CONFIG.observationChart.formUuid
     );
     // First create round zero provided when no any round has been made
 

@@ -16,9 +16,16 @@ export const { selectAll: getAllBills, selectEntities: getBillEntities } =
 export const getPatientBills = createSelector(
   getAllBills,
   getBillItemsGroupedByBill,
-  (bills: BillObject[], groupedBillItems: any) => {
-    // TODO: Implement support to filter bills by client
-    return bills;
+  getActiveVisit,
+  (bills: BillObject[], groupedBillItems: any, activeVisit: any) => {
+    if (!activeVisit) {
+      return bills;
+    }
+
+    // Filter bills by the active visit's patient
+    return bills.filter(
+      (bill) => bill?.patientUuid === activeVisit?.patientUuid
+    );
   }
 );
 

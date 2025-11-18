@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { from, Observable, of, zip } from "rxjs";
 import { flatten } from "lodash";
-import { catchError, map } from "rxjs/operators";
+import { catchError, expand, map, reduce, takeWhile } from "rxjs/operators";
 import { BASE_URL } from "src/app/shared/constants/constants.constants";
 import { OpenmrsHttpClientService } from "src/app/shared/modules/openmrs-http-client/services/openmrs-http-client.service";
 import { Api } from "src/app/shared/resources/openmrs";
@@ -68,25 +68,41 @@ export class CurrentUserService {
   }
 
   getRolesDetails(): Observable<any> {
-    // TODO: Find a way to dynamically load all roles by pagination
-    return zip(
-      ...[0, 100].map((pageIndex) =>
-        this.httpClient
-          .get(
-            `role?startIndex=${pageIndex}&limit=100&v=custom:(uuid,name,privileges:(uuid,name))`
-          )
-          .pipe(
-            map((response) => {
-              return response?.results;
-            }),
-            catchError((error) => of([]))
-          )
-      )
-    ).pipe(
-      map((response: any) => {
-        return flatten(response);
-      })
+    const pageSize = 100;
+
+    return this.fetchRolesPage(0, pageSize).pipe(
+      expand((response: any) => {
+        // Check if there are more results to fetch
+        const hasMoreResults =
+          response.results && response.results.length === pageSize;
+        return hasMoreResults
+          ? this.fetchRolesPage(response.nextStartIndex, pageSize)
+          : of({ results: [], nextStartIndex: 0, done: true });
+      }),
+      takeWhile((response: any) => !response.done, true),
+      reduce((acc: any[], response: any) => {
+        return [...acc, ...response.results];
+      }, [])
     );
+  }
+
+  private fetchRolesPage(startIndex: number, limit: number): Observable<any> {
+    return this.httpClient
+      .get(
+        `role?startIndex=${startIndex}&limit=${limit}&v=custom:(uuid,name,privileges:(uuid,name))`
+      )
+      .pipe(
+        map((response) => {
+          return {
+            results: response?.results || [],
+            nextStartIndex: startIndex + limit,
+            done: false,
+          };
+        }),
+        catchError((error) =>
+          of({ results: [], nextStartIndex: 0, done: true })
+        )
+      );
   }
 
   getProviderAttributes(): Observable<ProviderAttributeModel[]> {

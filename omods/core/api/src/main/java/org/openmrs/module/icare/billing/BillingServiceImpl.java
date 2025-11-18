@@ -174,14 +174,28 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 			}
 		} else {
 			Invoice existingInvoice = invoices.get(0);
+
+			// Check if payment has been made for this invoice before allowing modifications
+			if (existingInvoice.getPayments() != null && !existingInvoice.getPayments().isEmpty()) {
+				// Check if there are any non-voided payments
+				boolean hasValidPayment = false;
+				for (Payment payment : existingInvoice.getPayments()) {
+					if (!payment.getVoided()) {
+						hasValidPayment = true;
+						break;
+					}
+				}
+
+				if (hasValidPayment && orderMetaData.getRemoveBill()) {
+					throw new APIException("Cannot remove bill item. Payment has already been made for this invoice. Please void the payment first.");
+				}
+			}
+
 			int foundIndex = -1;
 			int deleteIndex = -1;
 			int index = 0;
 			for (InvoiceItem invoiceItem1 : existingInvoice.getInvoiceItems()) {
 				if (invoiceItem1.getOrder().getUuid().equals(orderMetaData.getOrder().getUuid())) {
-					/**
-					 * TODO - Check if there payment has been done and throw an error
-					 */
 					if (orderMetaData.getOrder() instanceof DrugOrder) {
 						DrugOrder drugOrder = (DrugOrder) orderMetaData.getOrder();
 						invoiceItem1.setQuantity(drugOrder.getQuantity());
@@ -563,42 +577,49 @@ public class BillingServiceImpl extends BaseOpenmrsService implements BillingSer
 		
 		OrderService orderService = Context.getService(OrderService.class);
 		VisitService visitService = Context.getService(VisitService.class);
+		AdministrationService administrationService = Context.getAdministrationService();
+
+		// Get configured care setting or default to ID 1 (Outpatient)
+		String careSettingId = administrationService.getGlobalProperty(ICareConfig.DEFAULT_CARE_SETTING);
+		CareSetting careSetting;
+		if (careSettingId != null && !careSettingId.trim().isEmpty()) {
+			careSetting = orderService.getCareSetting(Integer.parseInt(careSettingId));
+		} else {
+			careSetting = orderService.getCareSetting(1); // Default to Outpatient if not configured
+		}
+
 		//List<Visit> visits = visitService.getVisitsByPatient(patient);
 		Date newDate = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(Integer.valueOf("24")));
 		//If this is the first visit for this patient create a registration fee order
 		//Check if patient existed in the system to determine whether they should be billed for Registration Fee
 		if (patient.getDateCreated().after(newDate)) {
-			//TODO Soft code the UUID for fee concept
 			Concept feeConcept = visitMetaData.getRegistrationFeeConcept();
-			
+
 			Order order = new Order();
 			order.setConcept(feeConcept);
 			order.setPatient(patient);
 			order.setEncounter(encounter);
 			order.setOrderer(providers.get(0));
 			order.setOrderType(visitMetaData.getBillingOrderType());
-			
+
 			OrderContext orderContext = new OrderContext();
-			
-			//TODO Softcode to get the current care setting of the visit
-			orderContext.setCareSetting(orderService.getCareSetting(1));
+			orderContext.setCareSetting(careSetting);
 			encounter.addOrder(order);
 			orderService.saveOrder(order, orderContext);
 		}
-		
+
 		//Get concepts for service
 		Concept serviceConcept = visitMetaData.getServiceConcept();
-		
+
 		Order order = new Order();
 		order.setConcept(serviceConcept);
 		order.setPatient(patient);
 		order.setEncounter(encounter);
 		order.setOrderer(providers.get(0));
 		order.setOrderType(visitMetaData.getConsultationOrderType());
-		
+
 		OrderContext orderContext = new OrderContext();
-		//TODO Softcode to get the current care setting of the visit
-		orderContext.setCareSetting(orderService.getCareSetting(1));
+		orderContext.setCareSetting(careSetting);
 		encounter.addOrder(order);
 		orderService.saveOrder(order, orderContext);
 	}

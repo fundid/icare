@@ -8,6 +8,7 @@ import { omit } from "lodash";
 import { LocationService } from "src/app/core/services";
 import { Dropdown } from "../../modules/form/models/dropdown.model";
 import { Observable, of } from "rxjs";
+import { ICARE_CONFIG } from "../../resources/config";
 
 @Component({
   selector: "app-manage-location-modal",
@@ -123,23 +124,22 @@ export class ManageLocationModalComponent implements OnInit {
 
   onSave(event: Event): void {
     event.stopPropagation();
-    // TODO: Find a way to softcode attribute type uuid using system settings
 
     let attributes = [
       {
-        attributeType: "d6794daf-f62f-454e-89eb-6ea98188352f",
+        attributeType: ICARE_CONFIG.location.attributes.service,
         value: this.formValues["service"]?.value,
       },
       {
-        attributeType: "iCARE101-UDSM-451f-8efe-a0db56f09676",
+        attributeType: ICARE_CONFIG.location.attributes.module,
         value: this.formValues["module"]?.value,
       },
       {
-        attributeType: "iCAR7002-UDSM-attr-8efe-a0db56f09676",
+        attributeType: ICARE_CONFIG.location.attributes.billingConcept,
         value: this.formValues["billingConcept"]?.value,
       },
       {
-        attributeType: "2c266002-2848-4d2b-bf1f-8b59d81e3f29",
+        attributeType: "2c266002-2848-4d2b-bf1f-8b59d81e3f29", // Form attribute UUID
         value: this.formValues["form"]?.value,
       },
     ];
